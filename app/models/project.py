@@ -1,4 +1,5 @@
 import uuid
+from app.models.source import Source
 
 
 class Project:
@@ -11,6 +12,8 @@ class Project:
         self.id = uuid.uuid4()  # Generate a unique UUID for each project
 
     def add_source(self, source):
+        if not isinstance(source, Source):
+            raise TypeError("Only Source objects can be added to a project")
         self.sources.append(source)
 
     def update_status(self, new_status: str):

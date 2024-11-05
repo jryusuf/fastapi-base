@@ -1,6 +1,7 @@
 import pytest
 import uuid
 from app.models.project import Project
+from app.models.source import Source
 
 
 def test_Given_a_project_When_adding_sources_Then_sources_list_is_updated_correctly():
@@ -81,3 +82,27 @@ def test_Given_a_new_project_When_creating_project_Then_default_status_is_stoppe
 
     # Then
     assert project.status == 'PAUSED'
+
+
+def test_Given_a_project_When_adding_sources_Then_only_source_objects_are_allowed():
+    # Given
+    project = Project(name="Source Validation Project")
+    valid_source = Source(url="https://example.com", name="Valid Source")
+
+    # When & Then
+    project.add_source(valid_source)
+    assert len(project.sources) == 1
+    assert project.sources[0] == valid_source
+
+    # Try adding invalid sources
+    invalid_sources = [
+        "Not a Source object",
+        123,
+        None,
+        {"url": "https://example.com", "name": "Dict Source"}
+    ]
+
+    # Check that adding non-Source objects raises an exception
+    for invalid_source in invalid_sources:
+        with pytest.raises(TypeError, match="Only Source objects can be added to a project"):
+            project.add_source(invalid_source)
